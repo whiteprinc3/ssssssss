@@ -126,8 +126,8 @@
                     </div>
                     <span class="text-sm font-semibold text-cyan-300">Субсидии CCG</span>
                 </div>
-                <div class="text-2xl font-extrabold text-white code-font">15k – 20k <span class="text-xs font-medium text-cyan-400">йен / транш</span></div>
-                <p class="text-xs text-gray-400 mt-2">Гос. поддержка при низком уровне преступности и убийств.</p>
+                <div class="text-2xl font-extrabold text-white code-font">0 – 50,000 <span class="text-xs font-medium text-cyan-400">йен / транш</span></div>
+                <p class="text-xs text-gray-400 mt-2">Надбавка от государства за баллы безопасности (5.0 → 50,000; 0.0 → 0).</p>
             </div>
 
             <div class="glass-card rounded-2xl p-6 relative overflow-hidden group">
@@ -279,17 +279,23 @@
                     </div>
 
                     <!-- CCG STATE SUBSIDY ITEM -->
-                    <div class="p-3.5 rounded-xl bg-cyan-950/50 border border-cyan-500/50 flex items-center justify-between shadow-md shadow-cyan-950/30">
-                        <div class="flex items-center space-x-3">
-                            <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-extrabold">8</div>
-                            <div>
-                                <div class="font-bold text-white flex items-center gap-1.5">
-                                    <i class="fa-solid fa-building-flag text-cyan-400"></i> Поддержка государства (Субсидии CCG)
+                    <div class="p-3.5 rounded-xl bg-cyan-950/50 border border-cyan-500/50 flex flex-col gap-2 shadow-md shadow-cyan-950/30">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 font-extrabold">8</div>
+                                <div>
+                                    <div class="font-bold text-white flex items-center gap-1.5">
+                                        <i class="fa-solid fa-building-flag text-cyan-400"></i> Поддержка государства (Субсидии CCG)
+                                    </div>
+                                    <div class="text-gray-300">Надбавка зависит от баллов безопасности города (оценка от 0.0 до 5.0).</div>
                                 </div>
-                                <div class="text-gray-300">Дотация фракции при низком уровне преступности и убийств в городе</div>
                             </div>
+                            <span class="text-cyan-400 font-extrabold code-font text-sm whitespace-nowrap">0 – 50,000 йен</span>
                         </div>
-                        <span class="text-cyan-400 font-extrabold code-font text-sm whitespace-nowrap">15,000 – 20,000 йен</span>
+                        <div class="text-gray-400 pl-11 space-y-0.5">
+                            <div>Формула: <span class="text-cyan-300 font-bold code-font">баллы × 10 000</span> йен.</div>
+                            <div>5.0 балла → <span class="text-emerald-300 font-bold">50,000</span> · 4.0 → <span class="text-emerald-300 font-bold">40,000</span> · 3.0 → <span class="text-emerald-300 font-bold">30,000</span> · … · 0.0 → <span class="text-red-300 font-bold">0</span> йен.</div>
+                        </div>
                     </div>
 
                     <div class="p-3 rounded-xl bg-gray-900/60 border border-gray-800/80 flex items-center justify-between">
@@ -487,7 +493,7 @@
                 <i class="fa-solid fa-calculator text-purple-400"></i>
                 Интерактивный Калькулятор Заработка & Дотаций
             </h2>
-            <p class="text-xs text-gray-400 mb-6">Оплата за товар = ставка профессии × количество. Для Доставщика дополнительно +10% от стоимости поставки.</p>
+            <p class="text-xs text-gray-400 mb-6">Оплата за товар = ставка профессии × количество × дни. Для Доставщика дополнительно +10% от стоимости поставки.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
                 <div class="space-y-4 text-xs">
@@ -561,12 +567,13 @@
                             </label>
                             <div id="subsidyInputBlock" class="hidden flex items-center gap-2 mt-1">
                                 <span class="text-cyan-400 font-bold text-lg">₽</span>
-                                <input type="number" id="subsidyAmount" value="17500" min="0" step="100" 
+                                <input type="number" id="subsidyAmount" value="50000" min="0" step="1000" 
                                        onchange="calculateIncome()" 
                                        class="w-full bg-gray-800 border border-cyan-600/50 text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-cyan-400 code-font"
                                        placeholder="Сумма субсидии">
                                 <span class="text-xs text-gray-400">йен</span>
                             </div>
+                            <p class="text-[10px] text-gray-500 mt-1">Субсидия = баллы безопасности × 10 000 (5.0 → 50,000 · 0.0 → 0).</p>
                         </div>
                     </div>
                 </div>
@@ -618,7 +625,6 @@
             calculateIncome();
         }
 
-        // Получаем данные выбранной опции
         function getSelectedJob() {
             var sel = document.getElementById("calcJob");
             var opt = sel.options[sel.selectedIndex];
@@ -635,14 +641,13 @@
             var hours = parseInt(document.getElementById("calcHours").value);
             var days = parseInt(document.getElementById("calcDays").value);
             var goodsQty = parseInt(document.getElementById("calcGoods").value);
-            
+
             var includeSubsidy = document.getElementById("subsidyCheck").checked;
             var subsidyAmount = parseFloat(document.getElementById("subsidyAmount").value) || 0;
-            
+
             var bonusPercent = parseFloat(document.getElementById("bonusPercent").value) || 0;
             var bonus = 1 + (bonusPercent / 100);
-            
-            // Обновляем отображение
+
             document.getElementById("bonusVal").innerText = bonusPercent + "%";
             document.getElementById("hoursVal").innerText = hours + " ч.";
             document.getElementById("daysVal").innerText = days + " дн.";
@@ -661,10 +666,10 @@
                 document.getElementById("goodsRate").innerText = job.rate + " йен / шт.";
             }
 
-            // Оплата за количество = ставка × количество (для гражданских)
+            // Оплата за количество = ставка × количество × дни (для гражданских)
             var goodsTotal = 0;
             if (!job.isCCG) {
-                goodsTotal = job.rate * goodsQty;
+                goodsTotal = job.rate * goodsQty * days;
 
                 // Доставщик: +10% от стоимости поставки
                 if (job.isDelivery && goodsTotal > 0) {
@@ -673,34 +678,31 @@
             }
             goodsTotal = Math.round(goodsTotal);
 
-            // База
-            var baseTotal;
+            // База (только для CCG — почасовка)
+            var baseTotal = 0;
             if (job.isCCG) {
                 baseTotal = Math.round(job.value * hours * days * bonus);
-            } else {
-                // для гражданских "базовая ставка" уже учтена в goodsTotal
-                baseTotal = 0;
             }
 
             var subsidy = includeSubsidy ? subsidyAmount : 0;
             var grandTotal = baseTotal + goodsTotal + subsidy;
 
             document.getElementById("calcResult").innerText = grandTotal.toLocaleString('ru-RU') + " йен";
-            
+
             var noteParts = [];
             if (job.isCCG) {
                 noteParts.push("почасовая " + job.value.toLocaleString('ru-RU') + " × " + hours + "ч × " + days + "дн");
             } else {
                 if (goodsQty > 0) {
                     var deliveryNote = job.isDelivery ? " (+10% поставка)" : "";
-                    noteParts.push(goodsQty + " шт × " + job.rate + " йен" + deliveryNote + " = " + goodsTotal.toLocaleString('ru-RU') + " йен");
+                    noteParts.push(goodsQty + " шт × " + job.rate + " йен × " + days + " дн" + deliveryNote + " = " + goodsTotal.toLocaleString('ru-RU') + " йен");
                 } else {
                     noteParts.push("укажите количество товара");
                 }
             }
             if (bonusPercent > 0 && job.isCCG) noteParts.push("надбавка +" + bonusPercent + "%");
             if (includeSubsidy && subsidyAmount > 0) noteParts.push("субсидия CCG " + subsidyAmount.toLocaleString('ru-RU') + " йен");
-            
+
             if (noteParts.length > 0) {
                 document.getElementById("calcNote").innerText = "Включает: " + noteParts.join(", ") + ".";
             } else {
